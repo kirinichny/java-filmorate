@@ -53,7 +53,7 @@ public class FilmValidationTest {
 
     @Test
     @DisplayName("Проверка валидации продолжительности фильма, когда она отрицательная")
-    public void DurationIsNegative() {
+    public void shouldFailValidationWhenDurationIsNegative() {
         film.setDuration(-1);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
