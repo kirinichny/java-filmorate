@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class FilmValidationTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    Film film;
+    private Film film;
 
     @BeforeEach
     public void createValidFilm() {

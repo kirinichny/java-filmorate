@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class UserValidationTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    User user;
+    private User user;
 
     @BeforeEach
     public void createValidUser() {

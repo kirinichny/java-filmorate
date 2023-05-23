@@ -1,49 +1,43 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
 
-    private final Map<Integer, User> usersData = new HashMap<>();
+    private final UserService userService;
 
     @GetMapping
     public List<User> getAllUsers() {
-        return new ArrayList<>(usersData.values());
+        log.debug("+ getAllFilms");
+        List<User> users = userService.getAllUsers();
+        log.debug("- getAllFilms: {}", users);
+        return users;
     }
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        int id = usersData.size() + 1;
-        user.setId(id);
-
-        usersData.put(id, user);
-        log.info("Создан новый пользователь #{}.", user.getId());
+        log.debug("+ createUser");
+        User createdUser = userService.createUser(user);
+        log.debug("- createUser: {}", user);
         return user;
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        int userId = user.getId();
-
-        if (usersData.containsKey(userId)) {
-            usersData.put(userId, user);
-            log.info("Данные пользователя #{} обновлены.", user.getId());
-            return user;
-        } else {
-            log.error("Пользователь #" + userId + " не найден.");
-            throw new ValidationException("Пользователь #" + userId + " не найден.");
-        }
+        log.debug("+ updateUser");
+        User updatedUser = userService.updateUser(user);
+        log.debug("- updateUser: {}", updatedUser);
+        return updatedUser;
     }
 }

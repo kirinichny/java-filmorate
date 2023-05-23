@@ -11,6 +11,8 @@ hs_err_pid*
 out/
 target/
 .mvn
+mvnw
+mvnw.cmd
 !**/src/main/**/target/
 !**/src/test/**/target/
 
