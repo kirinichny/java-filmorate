@@ -13,50 +13,83 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserStorage userStorage;
 
     public User getUserById(Long userId) {
-        return userStorage.getUserById(userId);
+        log.debug("+ getUserById: userId={}", userId);
+        User user = userStorage.getUserById(userId);
+        log.debug("- getUserById: {}", user);
+        return user;
     }
 
     public List<User> getUsers() {
-        return userStorage.getUsers();
+        log.debug("+ getUsers");
+        List<User> users = userStorage.getUsers();
+        log.debug("- getUsers: {}", users);
+        return users;
     }
 
     public User createUser(User user) {
-        return userStorage.createUser(user);
+        log.debug("+ createUser: {}", user);
+        User createdUser = userStorage.createUser(user);
+        log.debug("- createUser: {}", createdUser);
+        return createdUser;
     }
 
     public User updateUser(User user) {
-        return userStorage.updateUser(user);
+        log.debug("+ updateUser: {}", user);
+        User updatedUser = userStorage.updateUser(user);
+        log.debug("- updateUser: {}", updatedUser);
+        return updatedUser;
     }
 
     public void deleteUser(Long userId) {
+        log.debug("+ deleteUser: userId={}", userId);
         userStorage.deleteUser(userId);
+        log.debug("- deleteUser");
     }
 
     public void addFriend(long userId, long friendId) {
+        log.debug("+ addFriend: userId={}, friendId={}", userId, friendId);
+
         User user = getUserById(userId);
         User friend = getUserById(friendId);
+
         user.getFriendIds().add(friendId);
         friend.getFriendIds().add(userId);
+
+        log.debug("- addFriend");
     }
 
     public void removeFriend(long userId, long friendId) {
+        log.debug("+ removeFriend: userId={}, friendId={}", userId, friendId);
+
         getUserById(userId).getFriendIds().remove(friendId);
         getUserById(friendId).getFriendIds().remove(userId);
+
+        log.debug("- removeFriend");
     }
 
     public List<User> getCommonFriends(long userId, long friendId) {
-        List<User> friends = getFriendsByUserId(userId);
+        log.debug("+ getCommonFriends: userId={}, friendId={}", userId, friendId);
+
+        final List<User> friends = getFriendsByUserId(userId);
         friends.retainAll(getFriendsByUserId(friendId));
+
+        log.debug("- getCommonFriends: {}", friends);
+
         return friends;
     }
 
     public List<User> getFriendsByUserId(long userId) {
-        return getUserById(userId).getFriendIds().stream()
+        log.debug("+ getFriendsByUserId: userId={}", userId);
+
+        List<User> friends = getUserById(userId).getFriendIds().stream()
                 .map(this::getUserById)
                 .collect(Collectors.toList());
+
+        log.debug("- getFriendsByUserId: {}", friends);
+
+        return friends;
     }
 }

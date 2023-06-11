@@ -18,55 +18,36 @@ public class FilmController {
 
     @GetMapping
     public List<Film> getFilms() {
-        log.debug("+ getAllFilms");
-        List<Film> films = filmService.getFilms();
-        log.debug("- getAllFilms: {}", films);
-        return films;
+        return filmService.getFilms();
     }
 
     @GetMapping("/{filmId}")
     public Film getFilmById(@PathVariable Long filmId) {
-        log.debug("+ getFilmById");
-        Film film = filmService.getFilmById(filmId);
-        log.debug("- getFilmById: {}", film);
-        return film;
+        return filmService.getFilmById(filmId);
     }
 
     @GetMapping("/popular")
     public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        log.debug("+ getMostPopularFilms");
-        List<Film> popularFilms = filmService.getMostPopularFilms(count);
-        log.debug("- getMostPopularFilms: {}", popularFilms);
-        return popularFilms;
+        return filmService.getMostPopularFilms(count);
     }
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        log.debug("+ addFilm");
-        Film addedFilm = filmService.addFilm(film);
-        log.debug("- addFilm: {}", addedFilm);
-        return addedFilm;
+        return filmService.addFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        log.debug("+ updateFilm");
-        Film updatedFilm = filmService.updateFilm(film);
-        log.debug("- updateFilm: {}", updatedFilm);
-        return updatedFilm;
+        return filmService.updateFilm(film);
     }
 
     @PutMapping("/{filmId}/like/{userId}")
     public void addLike(@PathVariable Long filmId, @PathVariable Long userId) {
-        log.debug("+ addLike");
         filmService.addLike(filmId, userId);
-        log.debug("- addLike: {}", filmService.getFilmById(filmId).getLikes());
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
-        log.debug("+ removeLike");
         filmService.removeLike(filmId, userId);
-        log.debug("- removeLike: {}", filmService.getFilmById(filmId).getLikes());
     }
 }

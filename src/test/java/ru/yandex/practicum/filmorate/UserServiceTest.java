@@ -4,14 +4,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorageImpl;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collections;
 import java.util.List;
 
+@SpringBootTest
 public class UserServiceTest {
 
     private UserStorage userStorage;
@@ -19,13 +21,13 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userStorage = new InMemoryUserStorage();
+        userStorage = new InMemoryUserStorageImpl();
         userService = new UserService(userStorage);
     }
 
     @Test
     @DisplayName("Метод createUser должен добавить пользователя в хранилище и вернуть его")
-    public void shouldCreateUser() {
+    public void shouldCreateUserInStorage() {
         User user = new User();
         user.setId(1L);
 
@@ -37,7 +39,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Метод updateUser должен обновить пользователя в хранилище и вернуть его")
-    public void shouldUpdateUser() {
+    public void shouldUpdateUserInStorage() {
         User user = new User();
         user.setId(1L);
         userStorage.createUser(user);
@@ -51,7 +53,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Метод deleteUser должен удалить пользователя из хранилища")
-    public void shouldDeleteUser() {
+    public void shouldDeleteUserInStorage() {
         User user = new User();
         user.setId(1L);
         userStorage.createUser(user);

@@ -4,30 +4,32 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorageImpl;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class FilmServiceTest {
     private FilmStorage filmStorage;
     private FilmService filmService;
 
     @BeforeEach
     public void setUp() {
-        filmStorage = new InMemoryFilmStorage();
+        filmStorage = new InMemoryFilmStorageImpl();
         filmService = new FilmService(filmStorage);
     }
 
     @Test
     @DisplayName("Метод addFilm должен добавить фильм в хранилище и вернуть его")
-    void shouldAddFilm() {
+    void shouldAddFilmInStorage() {
         Film film = new Film();
         film.setId(1L);
 
@@ -39,7 +41,7 @@ class FilmServiceTest {
 
     @Test
     @DisplayName("Метод updateFilm должен обновить фильм в хранилище и вернуть его")
-    void shouldUpdateFilm() {
+    void shouldUpdateFilmInStorage() {
         Film film = new Film();
         film.setId(1L);
         filmStorage.addFilm(film);
@@ -53,7 +55,7 @@ class FilmServiceTest {
 
     @Test
     @DisplayName("Метод deleteFilm должен удалить фильм из хранилища")
-    void shouldDeleteFilm() {
+    void shouldDeleteFilmInStorage() {
         Film film = new Film();
         film.setId(1L);
         filmStorage.addFilm(film);

@@ -1,9 +1,10 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class InMemoryFilmStorage implements FilmStorage {
+public class InMemoryFilmStorageImpl implements FilmStorage {
     private final Map<Long, Film> filmsData = new HashMap<>();
 
     @Override
@@ -39,15 +40,36 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) {
-        Long filmId = film.getId();
+    public Film updateFilm(Film updatedFilm) {
+        Long filmId = updatedFilm.getId();
 
         if (!filmsData.containsKey(filmId)) {
             log.error("Фильм #" + filmId + " не найден.");
             throw new NotFoundException("Фильм #" + filmId + " не найден.");
         }
 
-        filmsData.put(filmId, film);
+        Film film = filmsData.get(filmId);
+
+        if (updatedFilm.getName() != null) {
+            film.setName(updatedFilm.getName());
+        }
+
+        if (updatedFilm.getDescription() != null) {
+            film.setDescription(updatedFilm.getDescription());
+        }
+
+        if (updatedFilm.getReleaseDate() != null) {
+            film.setReleaseDate(updatedFilm.getReleaseDate());
+        }
+
+        if (updatedFilm.getDuration() != null) {
+            film.setDuration(updatedFilm.getDuration());
+        }
+
+        if (updatedFilm.getLikes() != null) {
+            film.setLikes(updatedFilm.getLikes());
+        }
+
         return film;
     }
 

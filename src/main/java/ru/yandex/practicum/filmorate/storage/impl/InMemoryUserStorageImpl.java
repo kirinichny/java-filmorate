@@ -1,9 +1,10 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class InMemoryUserStorage implements UserStorage {
+public class InMemoryUserStorageImpl implements UserStorage {
     private final Map<Long, User> usersData = new HashMap<>();
 
     @Override
@@ -39,15 +40,36 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
-        Long userId = user.getId();
+    public User updateUser(User updatedUser) {
+        Long userId = updatedUser.getId();
 
         if (!usersData.containsKey(userId)) {
             log.error("Пользователь #" + userId + " не найден.");
             throw new NotFoundException("Пользователь #" + userId + " не найден.");
         }
 
-        usersData.put(userId, user);
+        User user = usersData.get(userId);
+
+        if (updatedUser.getEmail() != null) {
+            user.setEmail(updatedUser.getEmail());
+        }
+
+        if (updatedUser.getLogin() != null) {
+            user.setLogin(updatedUser.getLogin());
+        }
+
+        if (updatedUser.getName() != null) {
+            user.setName(updatedUser.getName());
+        }
+
+        if (updatedUser.getBirthday() != null) {
+            user.setBirthday(updatedUser.getBirthday());
+        }
+
+        if (updatedUser.getFriendIds() != null) {
+            user.setFriendIds(updatedUser.getFriendIds());
+        }
+
         return user;
     }
 

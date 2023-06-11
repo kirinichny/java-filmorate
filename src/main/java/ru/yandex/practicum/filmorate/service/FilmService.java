@@ -20,32 +20,49 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     public Film getFilmById(Long filmId) {
-        return filmStorage.getFilmById(filmId);
+        log.debug("+ getFilmById: filmId={}", filmId);
+        Film film = filmStorage.getFilmById(filmId);
+        log.debug("- getFilmById: {}", film);
+        return film;
     }
 
     public List<Film> getFilms() {
-        return filmStorage.getFilms();
+        log.debug("+ getFilms");
+        List<Film> films = filmStorage.getFilms();
+        log.debug("- getFilms: {}", films);
+        return films;
     }
 
     public Film addFilm(Film film) {
-        return filmStorage.addFilm(film);
+        log.debug("+ addFilm: {}", film);
+        Film addedFilm = filmStorage.addFilm(film);
+        log.debug("- addFilm: {}", addedFilm);
+        return addedFilm;
     }
 
     public Film updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+        log.debug("+ updateFilm: {}", film);
+        Film updatedFilm = filmStorage.updateFilm(film);
+        log.debug("- updateFilm: {}", updatedFilm);
+        return updatedFilm;
     }
 
     public void deleteFilm(Long filmId) {
+        log.debug("+ deleteFilm: filmId={}", filmId);
         filmStorage.deleteFilm(filmId);
+        log.debug("- deleteFilm");
     }
 
     public void addLike(long filmId, long userId) {
+        log.debug("+ addLike: filmId={}, userId={}", filmId, userId);
         getFilmById(filmId).getLikes().add(userId);
+        log.debug("- addLike: likes={}", getFilmById(filmId).getLikes());
     }
 
     public void removeLike(long filmId, long userId) {
-        Film film = getFilmById(filmId);
-        Set<Long> likes = getFilmById(filmId).getLikes();
+        log.debug("+ removeLike filmId={}, userId={}", filmId, userId);
+
+        final Set<Long> likes = getFilmById(filmId).getLikes();
 
         if (!likes.contains(userId)) {
             log.error("Лайк пользователя #" + userId + " не найден.");
@@ -53,12 +70,20 @@ public class FilmService {
         }
 
         likes.remove(userId);
+
+        log.debug("- removeLike: likes={}", likes);
     }
 
     public List<Film> getMostPopularFilms(int count) {
-        return getFilms().stream()
+        log.debug("+ getMostPopularFilms: {}", count);
+
+        List<Film> popularFilms = getFilms().stream()
                 .sorted(Collections.reverseOrder(Comparator.comparingInt(Film::getLikesCount)))
                 .limit(count)
                 .collect(Collectors.toList());
+
+        log.debug("- getMostPopularFilms: {}", popularFilms);
+
+        return popularFilms;
     }
 }
