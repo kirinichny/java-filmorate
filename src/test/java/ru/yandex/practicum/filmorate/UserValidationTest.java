@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,9 +12,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 public class UserValidationTest {
@@ -35,7 +33,7 @@ public class UserValidationTest {
     public void shouldFailValidationWhenEmailIsNull() {
         user.setEmail(null);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        assertFalse(violations.isEmpty());
+        Assertions.assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -43,7 +41,7 @@ public class UserValidationTest {
     public void shouldFailValidationWhenEmailIsInvalid() {
         user.setEmail("mail.ru");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        assertFalse(violations.isEmpty());
+        Assertions.assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -51,7 +49,7 @@ public class UserValidationTest {
     public void shouldFailValidationWhenLoginIsNull() {
         user.setLogin(null);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        assertFalse(violations.isEmpty());
+        Assertions.assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -59,14 +57,14 @@ public class UserValidationTest {
     public void shouldFailValidationWhenLoginIsInvalid() {
         user.setLogin("login with space");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        assertFalse(violations.isEmpty());
+        Assertions.assertFalse(violations.isEmpty());
     }
 
     @Test
     @DisplayName("Имя должно быть как логин, когда имя равно null")
     public void shouldReturnNameAsLoginWhenNameIsNull() {
         user.setName(null);
-        assertEquals(user.getLogin(), user.getName());
+        Assertions.assertEquals(user.getLogin(), user.getName());
     }
 
     @Test
@@ -74,7 +72,7 @@ public class UserValidationTest {
     public void shouldFailValidationWhenBirthdayIsInFuture() {
         user.setBirthday(LocalDate.of(2999, 1, 1));
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        assertFalse(violations.isEmpty());
+        Assertions.assertFalse(violations.isEmpty());
     }
 
 }

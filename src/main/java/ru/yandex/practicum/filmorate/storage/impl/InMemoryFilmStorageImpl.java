@@ -50,25 +50,11 @@ public class InMemoryFilmStorageImpl implements FilmStorage {
 
         Film film = filmsData.get(filmId);
 
-        if (updatedFilm.getName() != null) {
-            film.setName(updatedFilm.getName());
-        }
-
-        if (updatedFilm.getDescription() != null) {
-            film.setDescription(updatedFilm.getDescription());
-        }
-
-        if (updatedFilm.getReleaseDate() != null) {
-            film.setReleaseDate(updatedFilm.getReleaseDate());
-        }
-
-        if (updatedFilm.getDuration() != null) {
-            film.setDuration(updatedFilm.getDuration());
-        }
-
-        if (updatedFilm.getLikes() != null) {
-            film.setLikes(updatedFilm.getLikes());
-        }
+        film.setName(updatedFilm.getName());
+        film.setDescription(updatedFilm.getDescription());
+        film.setReleaseDate(updatedFilm.getReleaseDate());
+        film.setDuration(updatedFilm.getDuration());
+        film.setLikes(updatedFilm.getLikes());
 
         return film;
     }

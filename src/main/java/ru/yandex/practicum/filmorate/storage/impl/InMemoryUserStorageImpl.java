@@ -50,25 +50,11 @@ public class InMemoryUserStorageImpl implements UserStorage {
 
         User user = usersData.get(userId);
 
-        if (updatedUser.getEmail() != null) {
-            user.setEmail(updatedUser.getEmail());
-        }
-
-        if (updatedUser.getLogin() != null) {
-            user.setLogin(updatedUser.getLogin());
-        }
-
-        if (updatedUser.getName() != null) {
-            user.setName(updatedUser.getName());
-        }
-
-        if (updatedUser.getBirthday() != null) {
-            user.setBirthday(updatedUser.getBirthday());
-        }
-
-        if (updatedUser.getFriendIds() != null) {
-            user.setFriendIds(updatedUser.getFriendIds());
-        }
+        user.setEmail(updatedUser.getEmail());
+        user.setLogin(updatedUser.getLogin());
+        user.setName(updatedUser.getName());
+        user.setBirthday(updatedUser.getBirthday());
+        user.setFriendIds(updatedUser.getFriendIds());
 
         return user;
     }

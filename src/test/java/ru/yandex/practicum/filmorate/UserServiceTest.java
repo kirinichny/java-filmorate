@@ -4,24 +4,25 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorageImpl;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Collections;
 import java.util.List;
 
 @SpringBootTest
 public class UserServiceTest {
-
+    @Mock
     private UserStorage userStorage;
     private UserService userService;
 
     @BeforeEach
     public void setUp() {
-        userStorage = new InMemoryUserStorageImpl();
+        MockitoAnnotations.openMocks(this);
         userService = new UserService(userStorage);
     }
 
@@ -31,10 +32,12 @@ public class UserServiceTest {
         User user = new User();
         user.setId(1L);
 
+        Mockito.when(userStorage.createUser(user)).thenReturn(user);
+
         User result = userService.createUser(user);
 
         Assertions.assertEquals(user, result);
-        Assertions.assertEquals(user, userStorage.getUserById(1L));
+        Mockito.verify(userStorage, Mockito.times(1)).createUser(user);
     }
 
     @Test
@@ -42,25 +45,24 @@ public class UserServiceTest {
     public void shouldUpdateUserInStorage() {
         User user = new User();
         user.setId(1L);
-        userStorage.createUser(user);
-
         user.setName("Имя");
+
+        Mockito.when(userStorage.updateUser(user)).thenReturn(user);
+
         User result = userService.updateUser(user);
 
         Assertions.assertEquals(user, result);
-        Assertions.assertEquals(user, userStorage.getUserById(1L));
+        Mockito.verify(userStorage, Mockito.times(1)).updateUser(user);
     }
 
     @Test
     @DisplayName("Метод deleteUser должен удалить пользователя из хранилища")
     public void shouldDeleteUserInStorage() {
-        User user = new User();
-        user.setId(1L);
-        userStorage.createUser(user);
+        Mockito.doNothing().when(userStorage).deleteUser(1L);
 
         userService.deleteUser(1L);
 
-        Assertions.assertEquals(Collections.emptyList(), userStorage.getUsers());
+        Mockito.verify(userStorage, Mockito.times(1)).deleteUser(1L);
     }
 
     @Test
@@ -70,15 +72,15 @@ public class UserServiceTest {
         user.setId(1L);
         User friend = new User();
         friend.setId(2L);
-        userStorage.createUser(user);
-        userStorage.createUser(friend);
+
+        Mockito.when(userStorage.getUserById(1L)).thenReturn(user);
+        Mockito.when(userStorage.getUserById(2L)).thenReturn(friend);
 
         userService.addFriend(1L, 2L);
 
         Assertions.assertTrue(user.getFriendIds().contains(2L));
         Assertions.assertTrue(friend.getFriendIds().contains(1L));
-        Assertions.assertEquals(user, userStorage.getUserById(1L));
-        Assertions.assertEquals(friend, userStorage.getUserById(2L));
+        Mockito.verify(userStorage, Mockito.times(2)).getUserById(Mockito.anyLong());
     }
 
     @Test
@@ -90,8 +92,9 @@ public class UserServiceTest {
         friend.setId(2L);
         user.getFriendIds().add(2L);
         friend.getFriendIds().add(1L);
-        userStorage.createUser(user);
-        userStorage.createUser(friend);
+
+        Mockito.when(userStorage.getUserById(1L)).thenReturn(user);
+        Mockito.when(userStorage.getUserById(2L)).thenReturn(friend);
 
         userService.removeFriend(1L, 2L);
 
@@ -116,14 +119,16 @@ public class UserServiceTest {
         user2.getFriendIds().add(3L);
         user3.getFriendIds().add(1L);
         user3.getFriendIds().add(2L);
-        userStorage.createUser(user1);
-        userStorage.createUser(user2);
-        userStorage.createUser(user3);
+
+        Mockito.when(userStorage.getUserById(1L)).thenReturn(user1);
+        Mockito.when(userStorage.getUserById(2L)).thenReturn(user2);
+        Mockito.when(userStorage.getUserById(3L)).thenReturn(user3);
 
         List<User> result = userService.getCommonFriends(1L, 2L);
 
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(user3, result.get(0));
+        Mockito.verify(userStorage, Mockito.times(6)).getUserById(Mockito.anyLong());
     }
 
     @Test
@@ -138,14 +143,16 @@ public class UserServiceTest {
         friend1.setId(2L);
         User friend2 = new User();
         friend2.setId(3L);
-        userStorage.createUser(user);
-        userStorage.createUser(friend1);
-        userStorage.createUser(friend2);
+
+        Mockito.when(userStorage.getUserById(1L)).thenReturn(user);
+        Mockito.when(userStorage.getUserById(2L)).thenReturn(friend1);
+        Mockito.when(userStorage.getUserById(3L)).thenReturn(friend2);
 
         List<User> result = userService.getFriendsByUserId(1L);
 
         Assertions.assertEquals(2, result.size());
         Assertions.assertEquals(friend1, result.get(0));
         Assertions.assertEquals(friend2, result.get(1));
+        Mockito.verify(userStorage, Mockito.times(3)).getUserById(Mockito.anyLong());
     }
 }
