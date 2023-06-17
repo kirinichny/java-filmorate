@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.ConstraintViolation;
@@ -11,8 +13,7 @@ import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
+@SpringBootTest
 public class FilmValidationTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -32,7 +33,7 @@ public class FilmValidationTest {
     public void shouldFailValidationWhenNameIsNull() {
         film.setName(null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertFalse(violations.isEmpty());
+        Assertions.assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -40,7 +41,7 @@ public class FilmValidationTest {
     public void shouldFailValidationWhenDescriptionIsTooLong() {
         film.setDescription(new String(new char[201]).replace("\0", "d"));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertFalse(violations.isEmpty());
+        Assertions.assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -48,7 +49,7 @@ public class FilmValidationTest {
     public void shouldFailValidationWhenReleaseDateIsInPast() {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertFalse(violations.isEmpty());
+        Assertions.assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -56,7 +57,7 @@ public class FilmValidationTest {
     public void shouldFailValidationWhenDurationIsNegative() {
         film.setDuration(-1);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertFalse(violations.isEmpty());
+        Assertions.assertFalse(violations.isEmpty());
     }
 
 }

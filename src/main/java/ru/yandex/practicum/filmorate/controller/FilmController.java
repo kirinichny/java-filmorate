@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -12,31 +12,42 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 @Slf4j
+@RequiredArgsConstructor
 public class FilmController {
-    @Autowired
-    private FilmService filmService;
+    private final FilmService filmService;
 
     @GetMapping
-    public List<Film> getAllFilms() {
-        log.debug("+ getAllFilms");
-        List<Film> films = filmService.getAllFilms();
-        log.debug("- getAllFilms: {}", films);
-        return films;
+    public List<Film> getFilms() {
+        return filmService.getFilms();
+    }
+
+    @GetMapping("/{filmId}")
+    public Film getFilmById(@PathVariable Long filmId) {
+        return filmService.getFilmById(filmId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        return filmService.getMostPopularFilms(count);
     }
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        log.debug("+ addFilm");
-        Film addedFilm = filmService.addFilm(film);
-        log.debug("- addFilm: {}", addedFilm);
-        return addedFilm;
+        return filmService.addFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        log.debug("+ updateFilm");
-        Film updatedFilm = filmService.updateFilm(film);
-        log.debug("- updateFilm: {}", updatedFilm);
-        return updatedFilm;
+        return filmService.updateFilm(film);
+    }
+
+    @PutMapping("/{filmId}/like/{userId}")
+    public void addLike(@PathVariable Long filmId, @PathVariable Long userId) {
+        filmService.addLike(filmId, userId);
+    }
+
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
+        filmService.removeLike(filmId, userId);
     }
 }

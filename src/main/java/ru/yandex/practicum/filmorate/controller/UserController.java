@@ -14,30 +14,45 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        log.debug("+ getAllFilms");
-        List<User> users = userService.getAllUsers();
-        log.debug("- getAllFilms: {}", users);
-        return users;
+    public List<User> getUsers() {
+        return userService.getUsers();
+    }
+
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public List<User> getFriendsByUserId(@PathVariable Long userId) {
+        return userService.getFriendsByUserId(userId);
+    }
+
+    @GetMapping("/{userId}/friends/common/{friendId}")
+    public List<User> getCommonFriends(@PathVariable Long userId, @PathVariable Long friendId) {
+        return userService.getCommonFriends(userId, friendId);
     }
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        log.debug("+ createUser");
-        User createdUser = userService.createUser(user);
-        log.debug("- createUser: {}", user);
-        return user;
+        return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        log.debug("+ updateUser");
-        User updatedUser = userService.updateUser(user);
-        log.debug("- updateUser: {}", updatedUser);
-        return updatedUser;
+        return userService.updateUser(user);
+    }
+
+    @PutMapping("/{userId}/friends/{friendId}")
+    public void addFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+        userService.addFriend(userId, friendId);
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public void removeFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+        userService.removeFriend(userId, friendId);
     }
 }
