@@ -11,7 +11,6 @@ import java.util.Set;
 @Data
 public class Film {
     private Long id;
-
     @NotBlank(message = "Название не должно быть пустым")
     private String name;
 
