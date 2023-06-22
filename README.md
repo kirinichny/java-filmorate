@@ -1,3 +1,3 @@
 # Filmorate
 ## Схема базы данных
-![Схема базы данных](docs/er_diagram.svg)
+![Схема базы данных](src/main/resources/static/er_diagram.svg)
