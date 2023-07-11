@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -15,9 +17,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class FilmService {
+
     private final FilmStorage filmStorage;
+
+    @Autowired
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
+    }
 
     public Film getFilmById(Long filmId) {
         log.debug("+ getFilmById: filmId={}", filmId);
@@ -55,23 +62,14 @@ public class FilmService {
 
     public void addLike(long filmId, long userId) {
         log.debug("+ addLike: filmId={}, userId={}", filmId, userId);
-        getFilmById(filmId).getLikes().add(userId);
+        filmStorage.addLike(filmId, userId);
         log.debug("- addLike: likes={}", getFilmById(filmId).getLikes());
     }
 
     public void removeLike(long filmId, long userId) {
         log.debug("+ removeLike filmId={}, userId={}", filmId, userId);
-
-        final Set<Long> likes = getFilmById(filmId).getLikes();
-
-        if (!likes.contains(userId)) {
-            log.error("Лайк пользователя #" + userId + " не найден.");
-            throw new NotFoundException("Лайк пользователя #" + userId + " не найден.");
-        }
-
-        likes.remove(userId);
-
-        log.debug("- removeLike: likes={}", likes);
+        filmStorage.removeLike(filmId, userId);
+        log.debug("- removeLike: likes={}", getFilmById(filmId).getLikes());
     }
 
     public List<Film> getMostPopularFilms(int count) {

@@ -60,7 +60,19 @@ public class InMemoryUserStorageImpl implements UserStorage {
     }
 
     @Override
-    public void deleteUser(Long userId) {
+    public void deleteUser(long userId) {
         usersData.remove(userId);
+    }
+
+    @Override
+    public void addFriend(long userId, long friendId) {
+        getUserById(userId).getFriendIds().add(friendId);
+        getUserById(friendId).getFriendIds().add(userId);
+    }
+
+    @Override
+    public void removeFriend(long userId, long friendId) {
+        getUserById(userId).getFriendIds().remove(friendId);
+        getUserById(friendId).getFriendIds().remove(userId);
     }
 }

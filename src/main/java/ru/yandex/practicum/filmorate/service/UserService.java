@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -11,9 +12,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
+
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     public User getUserById(Long userId) {
         log.debug("+ getUserById: userId={}", userId);
@@ -51,31 +55,24 @@ public class UserService {
 
     public void addFriend(long userId, long friendId) {
         log.debug("+ addFriend: userId={}, friendId={}", userId, friendId);
-
         User user = getUserById(userId);
         User friend = getUserById(friendId);
-
-        user.getFriendIds().add(friendId);
-        friend.getFriendIds().add(userId);
-
+        userStorage.addFriend(user.getId(), friend.getId());
         log.debug("- addFriend");
     }
 
     public void removeFriend(long userId, long friendId) {
         log.debug("+ removeFriend: userId={}, friendId={}", userId, friendId);
-
-        getUserById(userId).getFriendIds().remove(friendId);
-        getUserById(friendId).getFriendIds().remove(userId);
-
+        User user = getUserById(userId);
+        User friend = getUserById(friendId);
+        userStorage.removeFriend(user.getId(), friend.getId());
         log.debug("- removeFriend");
     }
 
     public List<User> getCommonFriends(long userId, long friendId) {
         log.debug("+ getCommonFriends: userId={}, friendId={}", userId, friendId);
-
         final List<User> friends = getFriendsByUserId(userId);
         friends.retainAll(getFriendsByUserId(friendId));
-
         log.debug("- getCommonFriends: {}", friends);
 
         return friends;
