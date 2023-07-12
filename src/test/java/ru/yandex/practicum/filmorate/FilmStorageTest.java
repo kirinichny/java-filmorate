@@ -158,7 +158,7 @@ class FilmStorageTest {
         film.setReleaseDate(LocalDate.now());
         film.setDuration(120);
         film.setMpa(new MpaRating(1L, "G"));
-        long filmId = filmStorage.addFilm(film);;
+        long filmId = filmStorage.addFilm(film);
 
         filmStorage.addLike(filmId, userId);
 
