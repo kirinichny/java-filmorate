@@ -1,2 +1,3 @@
-# java-filmorate
-Template repository for Filmorate project.
+# Filmorate
+## Схема базы данных
+![Схема базы данных](docs/er-diagram.svg)

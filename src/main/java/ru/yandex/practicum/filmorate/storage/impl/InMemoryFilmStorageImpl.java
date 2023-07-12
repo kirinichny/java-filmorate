@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 @Slf4j
@@ -32,16 +33,16 @@ public class InMemoryFilmStorageImpl implements FilmStorage {
     }
 
     @Override
-    public Film addFilm(Film film) {
-        Long id = filmsData.size() + 1L;
+    public Long addFilm(Film film) {
+        final Long id = filmsData.size() + 1L;
         film.setId(id);
         filmsData.put(id, film);
-        return film;
+        return film.getId();
     }
 
     @Override
-    public Film updateFilm(Film updatedFilm) {
-        Long filmId = updatedFilm.getId();
+    public Long updateFilm(Film updatedFilm) {
+        final Long filmId = updatedFilm.getId();
 
         if (!filmsData.containsKey(filmId)) {
             log.error("Фильм #" + filmId + " не найден.");
@@ -56,11 +57,28 @@ public class InMemoryFilmStorageImpl implements FilmStorage {
         film.setDuration(updatedFilm.getDuration());
         film.setLikes(updatedFilm.getLikes());
 
-        return film;
+        return filmId;
     }
 
     @Override
     public void deleteFilm(long filmId) {
         filmsData.remove(filmId);
+    }
+
+    @Override
+    public void addLike(long filmId, long userId) {
+        getFilmById(filmId).getLikes().add(userId);
+    }
+
+    @Override
+    public void removeLike(long filmId, long userId) {
+        final Set<Long> likes = getFilmById(filmId).getLikes();
+
+        if (!likes.contains(userId)) {
+            log.error("Лайк пользователя #" + userId + " не найден.");
+            throw new NotFoundException("Лайк пользователя #" + userId + " не найден.");
+        }
+
+        likes.remove(userId);
     }
 }
