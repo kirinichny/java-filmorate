@@ -34,14 +34,14 @@ public class UserService {
 
     public User createUser(User user) {
         log.debug("+ createUser: {}", user);
-        User createdUser = userStorage.createUser(user);
+        User createdUser = userStorage.getUserById(userStorage.createUser(user));
         log.debug("- createUser: {}", createdUser);
         return createdUser;
     }
 
     public User updateUser(User user) {
         log.debug("+ updateUser: {}", user);
-        User updatedUser = userStorage.updateUser(user);
+        User updatedUser = userStorage.getUserById(userStorage.updateUser(user));
         log.debug("- updateUser: {}", updatedUser);
         return updatedUser;
     }

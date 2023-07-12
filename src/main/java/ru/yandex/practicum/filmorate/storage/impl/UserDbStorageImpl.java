@@ -10,7 +10,13 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component("userDbStorage")
@@ -18,49 +24,53 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserDbStorageImpl implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
+    private static final String SELECT_USER_BY_ID_QUERY = "SELECT " +
+            "users.id, " +
+            "users.email, " +
+            "users.login, " +
+            "users.name, " +
+            "users.birthday, " +
+            "GROUP_CONCAT(friendships.to_user_id separator ',') AS friend_ids " +
+            "FROM users " +
+            "LEFT JOIN friendships ON users.id = friendships.from_user_id " +
+            "WHERE users.id = ?" +
+            "GROUP BY users.id";
+    private static final String SELECT_ALL_USERS_QUERY = "SELECT " +
+            "users.id, " +
+            "users.email, " +
+            "users.login, " +
+            "users.name, " +
+            "users.birthday, " +
+            "GROUP_CONCAT(friendships.to_user_id separator ',') AS friend_ids " +
+            "FROM users " +
+            "LEFT JOIN friendships ON users.id = friendships.from_user_id " +
+            "GROUP BY users.id";
+    private static final String UPDATE_USER_QUERY = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
+    private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
+    private static final String INSERT_FRIENDSHIP_QUERY = "INSERT INTO friendships (from_user_id, to_user_id) VALUES (?, ?)";
+    private static final String DELETE_FRIENDSHIP_QUERY = "DELETE FROM friendships WHERE from_user_id = ? AND to_user_id = ?";
 
     @Override
     public User getUserById(Long userId) {
-        String query = "SELECT " +
-                "users.id, " +
-                "users.email, " +
-                "users.login, " +
-                "users.name, " +
-                "users.birthday, " +
-                "GROUP_CONCAT(friendships.to_user_id separator ',') AS friend_ids " +
-                "FROM users " +
-                "LEFT JOIN friendships ON users.id = friendships.from_user_id " +
-                "WHERE users.id = ?" +
-                "GROUP BY users.id";
+        Optional<User> users = jdbcTemplate.query(SELECT_USER_BY_ID_QUERY, userRowMapper(), userId)
+                .stream()
+                .findFirst();
 
-        List<User> users = jdbcTemplate.query(query, userRowMapper(), userId);
-
-        if (users.size() != 1) {
+        if (users.isEmpty()) {
             log.error("Пользователь #" + userId + " не найден.");
             throw new NotFoundException("Пользователь #" + userId + " не найден.");
         }
 
-        return users.get(0);
+        return users.get();
     }
 
     @Override
     public List<User> getUsers() {
-        String query = "SELECT " +
-                "users.id, " +
-                "users.email, " +
-                "users.login, " +
-                "users.name, " +
-                "users.birthday, " +
-                "GROUP_CONCAT(friendships.to_user_id separator ',') AS friend_ids " +
-                "FROM users " +
-                "LEFT JOIN friendships ON users.id = friendships.from_user_id " +
-                "GROUP BY users.id";
-
-        return jdbcTemplate.query(query, userRowMapper());
+        return jdbcTemplate.query(SELECT_ALL_USERS_QUERY, userRowMapper());
     }
 
     @Override
-    public User createUser(User user) {
+    public Long createUser(User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
@@ -72,33 +82,28 @@ public class UserDbStorageImpl implements UserStorage {
                 "birthday", user.getBirthday().toString()
         );
 
-        Long userId = simpleJdbcInsert.executeAndReturnKey(params).longValue();
-
-        return getUserById(userId);
+        return simpleJdbcInsert.executeAndReturnKey(params).longValue();
     }
 
     @Override
-    public User updateUser(User user) {
-        Long userId = user.getId();
-
-        String query = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
-        jdbcTemplate.update(query, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), userId);
-
-        return getUserById(userId);
+    public Long updateUser(User user) {
+        final Long userId = user.getId();
+        jdbcTemplate.update(UPDATE_USER_QUERY, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), userId);
+        return userId;
     }
 
     @Override
     public void deleteUser(long userId) {
-        jdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
+        jdbcTemplate.update(DELETE_USER_QUERY, userId);
     }
 
     public void addFriend(long userId, long friendId) {
-        jdbcTemplate.update("INSERT INTO friendships (from_user_id, to_user_id) VALUES (?, ?)", userId, friendId);
+        jdbcTemplate.update(INSERT_FRIENDSHIP_QUERY, userId, friendId);
     }
 
     @Override
     public void removeFriend(long userId, long friendId) {
-        jdbcTemplate.update("DELETE FROM friendships WHERE from_user_id = ? AND to_user_id = ?", userId, friendId);
+        jdbcTemplate.update(DELETE_FRIENDSHIP_QUERY, userId, friendId);
     }
 
     private RowMapper<User> userRowMapper() {
@@ -116,7 +121,7 @@ public class UserDbStorageImpl implements UserStorage {
     }
 
     private Set<Long> parseFriendIds(String friendIdsString) {
-        if (friendIdsString == null) {
+        if (Objects.isNull(friendIdsString)) {
             return Collections.emptySet();
         }
 

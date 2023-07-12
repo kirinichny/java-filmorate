@@ -39,14 +39,14 @@ public class FilmService {
 
     public Film addFilm(Film film) {
         log.debug("+ addFilm: {}", film);
-        Film addedFilm = filmStorage.addFilm(film);
+        Film addedFilm = filmStorage.getFilmById(filmStorage.addFilm(film));
         log.debug("- addFilm: {}", addedFilm);
         return addedFilm;
     }
 
     public Film updateFilm(Film film) {
         log.debug("+ updateFilm: {}", film);
-        Film updatedFilm = filmStorage.updateFilm(film);
+        Film updatedFilm = filmStorage.getFilmById(filmStorage.updateFilm(film));
         log.debug("- updateFilm: {}", updatedFilm);
         return updatedFilm;
     }

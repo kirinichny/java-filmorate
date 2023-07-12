@@ -3,9 +3,14 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -30,6 +35,6 @@ public class User {
     private Set<Long> friendIds = new HashSet<>();
 
     public String getName() {
-        return (name == null || name.isBlank()) ? login : name;
+        return (Objects.isNull(name) || name.isBlank()) ? login : name;
     }
 }

@@ -31,8 +31,8 @@ class UserStorageTest {
         user.setName("Name");
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
-        User addedUser = userStorage.createUser(user);
-        User retrievedUser = userStorage.getUserById(addedUser.getId());
+        Long addedUserId = userStorage.createUser(user);
+        User retrievedUser = userStorage.getUserById(addedUserId);
 
         Assertions.assertNotNull(retrievedUser);
 
@@ -91,14 +91,14 @@ class UserStorageTest {
         user.setName("Name");
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
-        User addedUser = userStorage.createUser(user);
+        User addedUser = userStorage.getUserById(userStorage.createUser(user));
 
         addedUser.setEmail("updated-user@mail.ru");
         addedUser.setLogin("updatedUser");
         addedUser.setName("Updated Name");
         addedUser.setBirthday(LocalDate.of(2002, 3, 2));
 
-        User updatedUser = userStorage.updateUser(addedUser);
+        User updatedUser = userStorage.getUserById(userStorage.updateUser(addedUser));
 
         Assertions.assertNotNull(updatedUser);
         Assertions.assertEquals(addedUser.getEmail(), updatedUser.getEmail());
@@ -117,13 +117,13 @@ class UserStorageTest {
         user.setName("Name");
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
-        User addedUser = userStorage.createUser(user);
+        Long addedUserId = userStorage.createUser(user);
 
-        userStorage.deleteUser(addedUser.getId());
+        userStorage.deleteUser(addedUserId);
 
         final NotFoundException exception = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> userStorage.getUserById(addedUser.getId())
+                () -> userStorage.getUserById(addedUserId)
         );
         Assertions.assertEquals("Пользователь #1 не найден.", exception.getMessage());
 
@@ -138,16 +138,14 @@ class UserStorageTest {
         user.setLogin("user");
         user.setName("Name");
         user.setBirthday(LocalDate.of(2000, 1, 1));
-        User addedUser = userStorage.createUser(user);
-        long userId = addedUser.getId();
+        long userId = userStorage.createUser(user);
 
         User friend = new User();
         friend.setEmail("friend@mail.ru");
         friend.setLogin("friend");
         friend.setName("Friend Name");
         friend.setBirthday(LocalDate.of(2000, 2, 1));
-        User addedFriend = userStorage.createUser(friend);
-        long friendId = addedFriend.getId();
+        long friendId = userStorage.createUser(friend);
 
         userStorage.addFriend(userId, friendId);
 
@@ -166,16 +164,14 @@ class UserStorageTest {
         user.setLogin("user");
         user.setName("Name");
         user.setBirthday(LocalDate.of(2000, 1, 1));
-        User addedUser = userStorage.createUser(user);
-        long userId = addedUser.getId();
+        long userId = userStorage.createUser(user);
 
         User friend = new User();
         friend.setEmail("friend@mail.ru");
         friend.setLogin("friend");
         friend.setName("Friend Name");
         friend.setBirthday(LocalDate.of(2000, 2, 1));
-        User addedFriend = userStorage.createUser(friend);
-        long friendId = addedFriend.getId();
+        long friendId = userStorage.createUser(friend);
 
         userStorage.addFriend(userId, friendId);
         userStorage.removeFriend(userId, friendId);

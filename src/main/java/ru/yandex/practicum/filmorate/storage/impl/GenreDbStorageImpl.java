@@ -10,32 +10,33 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class GenreDbStorageImpl implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
+    private static final String SELECT_GENRE_BY_ID_QUERY = "SELECT genres.id, genres.name FROM genres WHERE id = ?";
+    private static final String SELECT_ALL_GENRES_QUERY = "SELECT genres.id, genres.name FROM genres";
 
     @Override
     public Genre getGenreById(Long genreId) {
-        String query = "SELECT genres.id, genres.name FROM genres WHERE id = ?";
+        Optional<Genre> genre = jdbcTemplate.query(SELECT_GENRE_BY_ID_QUERY, genreRowMapper(), genreId)
+                .stream()
+                .findFirst();
 
-        List<Genre> genres = jdbcTemplate.query(query, genreRowMapper(), genreId);
-
-        if (genres.size() != 1) {
+        if (genre.isEmpty()) {
             log.error("Жанр #" + genreId + " не найден.");
             throw new NotFoundException("Жанр #" + genreId + " не найден.");
         }
 
-        return genres.get(0);
+        return genre.get();
     }
 
     @Override
     public List<Genre> getGenres() {
-        String query = "SELECT genres.id, genres.name FROM genres";
-
-        return jdbcTemplate.query(query, genreRowMapper());
+        return jdbcTemplate.query(SELECT_ALL_GENRES_QUERY, genreRowMapper());
     }
 
     private RowMapper<Genre> genreRowMapper() {

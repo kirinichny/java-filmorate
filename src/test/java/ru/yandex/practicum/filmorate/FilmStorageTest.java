@@ -36,8 +36,8 @@ class FilmStorageTest {
         film.setDuration(120);
         film.setMpa(new MpaRating(1L, "G"));
 
-        Film addedFilm = filmStorage.addFilm(film);
-        Film retrievedFilm = filmStorage.getFilmById(addedFilm.getId());
+        Long addedFilmId = filmStorage.addFilm(film);
+        Film retrievedFilm = filmStorage.getFilmById(addedFilmId);
 
         Assertions.assertNotNull(retrievedFilm);
         Assertions.assertEquals("Film Name", retrievedFilm.getName());
@@ -100,7 +100,8 @@ class FilmStorageTest {
         film.setDuration(120);
         film.setMpa(new MpaRating(1L, "G"));
 
-        Film addedFilm = filmStorage.addFilm(film);
+        Long addedFilmId = filmStorage.addFilm(film);
+        Film addedFilm = filmStorage.getFilmById(addedFilmId);
 
         addedFilm.setName("Updated Film Name");
         addedFilm.setDescription("Updated Film Description");
@@ -108,7 +109,7 @@ class FilmStorageTest {
         addedFilm.setDuration(90);
         addedFilm.setMpa(new MpaRating(2L, "PG"));
 
-        Film updatedFilm = filmStorage.updateFilm(addedFilm);
+        Film updatedFilm = filmStorage.getFilmById(filmStorage.updateFilm(addedFilm));
 
         Assertions.assertNotNull(updatedFilm);
         Assertions.assertEquals("Updated Film Name", updatedFilm.getName());
@@ -129,13 +130,13 @@ class FilmStorageTest {
         film.setDuration(120);
         film.setMpa(new MpaRating(1L, "G"));
 
-        Film addedFilm = filmStorage.addFilm(film);
+        Long addedFilmId = filmStorage.addFilm(film);
 
-        filmStorage.deleteFilm(addedFilm.getId());
+        filmStorage.deleteFilm(addedFilmId);
 
         final NotFoundException exception = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> filmStorage.getFilmById(addedFilm.getId())
+                () -> filmStorage.getFilmById(addedFilmId)
         );
         Assertions.assertEquals("Фильм #1 не найден.", exception.getMessage());
 
@@ -149,8 +150,7 @@ class FilmStorageTest {
         user.setEmail("user@mail.ru");
         user.setLogin("userLogin");
         user.setBirthday(LocalDate.of(1990, 1, 1));
-        User addedUser = userStorage.createUser(user);
-        long userId = addedUser.getId();
+        final long userId = userStorage.createUser(user);
 
         Film film = new Film();
         film.setName("Film Name");
@@ -158,8 +158,7 @@ class FilmStorageTest {
         film.setReleaseDate(LocalDate.now());
         film.setDuration(120);
         film.setMpa(new MpaRating(1L, "G"));
-        Film addedFilm = filmStorage.addFilm(film);
-        long filmId = addedFilm.getId();
+        long filmId = filmStorage.addFilm(film);;
 
         filmStorage.addLike(filmId, userId);
 
@@ -177,8 +176,7 @@ class FilmStorageTest {
         user.setEmail("user@mail.ru");
         user.setLogin("userLogin");
         user.setBirthday(LocalDate.of(1990, 1, 1));
-        User addedUser = userStorage.createUser(user);
-        long userId = addedUser.getId();
+        long userId = userStorage.createUser(user);
 
         Film film = new Film();
         film.setName("Film Name");
@@ -186,8 +184,7 @@ class FilmStorageTest {
         film.setReleaseDate(LocalDate.now());
         film.setDuration(120);
         film.setMpa(new MpaRating(1L, "G"));
-        Film addedFilm = filmStorage.addFilm(film);
-        long filmId = addedFilm.getId();
+        long filmId = filmStorage.addFilm(film);
 
         filmStorage.addLike(filmId, userId);
         filmStorage.removeLike(filmId, userId);

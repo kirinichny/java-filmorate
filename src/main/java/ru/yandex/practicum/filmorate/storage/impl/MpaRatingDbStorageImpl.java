@@ -10,32 +10,33 @@ import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.MpaRatingStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class MpaRatingDbStorageImpl implements MpaRatingStorage {
     private final JdbcTemplate jdbcTemplate;
+    private static final String SELECT_MPA_RATING_BY_ID_QUERY = "SELECT mpa_ratings.id, mpa_ratings.name FROM mpa_ratings WHERE id = ?";
+    private static final String SELECT_ALL_MPA_RATINGS_QUERY = "SELECT mpa_ratings.id, mpa_ratings.name FROM mpa_ratings";
 
     @Override
     public MpaRating getMpaRatingById(Long mpaRatingId) {
-        String query = "SELECT mpa_ratings.id, mpa_ratings.name FROM mpa_ratings WHERE id = ?";
+        Optional<MpaRating> mpaRatings = jdbcTemplate.query(SELECT_MPA_RATING_BY_ID_QUERY, mpaRatingRowMapper(), mpaRatingId)
+                .stream()
+                .findFirst();
 
-        List<MpaRating> mpaRatings = jdbcTemplate.query(query, mpaRatingRowMapper(), mpaRatingId);
-
-        if (mpaRatings.size() != 1) {
+        if (mpaRatings.isEmpty()) {
             log.error("Рейтинг #" + mpaRatingId + " не найден.");
             throw new NotFoundException("Рейтинг #" + mpaRatingId + " не найден.");
         }
 
-        return mpaRatings.get(0);
+        return mpaRatings.get();
     }
 
     @Override
     public List<MpaRating> getMpaRatings() {
-        String query = "SELECT mpa_ratings.id, mpa_ratings.name FROM mpa_ratings";
-
-        return jdbcTemplate.query(query, mpaRatingRowMapper());
+        return jdbcTemplate.query(SELECT_ALL_MPA_RATINGS_QUERY, mpaRatingRowMapper());
     }
 
     private RowMapper<MpaRating> mpaRatingRowMapper() {
