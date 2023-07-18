@@ -32,16 +32,16 @@ public class InMemoryUserStorageImpl implements UserStorage {
     }
 
     @Override
-    public User createUser(User user) {
-        Long id = usersData.size() + 1L;
+    public Long createUser(User user) {
+        final Long id = usersData.size() + 1L;
         user.setId(id);
         usersData.put(id, user);
-        return user;
+        return user.getId();
     }
 
     @Override
-    public User updateUser(User updatedUser) {
-        Long userId = updatedUser.getId();
+    public Long updateUser(User updatedUser) {
+        final Long userId = updatedUser.getId();
 
         if (!usersData.containsKey(userId)) {
             log.error("Пользователь #" + userId + " не найден.");
@@ -56,11 +56,23 @@ public class InMemoryUserStorageImpl implements UserStorage {
         user.setBirthday(updatedUser.getBirthday());
         user.setFriendIds(updatedUser.getFriendIds());
 
-        return user;
+        return userId;
     }
 
     @Override
-    public void deleteUser(Long userId) {
+    public void deleteUser(long userId) {
         usersData.remove(userId);
+    }
+
+    @Override
+    public void addFriend(long userId, long friendId) {
+        getUserById(userId).getFriendIds().add(friendId);
+        getUserById(friendId).getFriendIds().add(userId);
+    }
+
+    @Override
+    public void removeFriend(long userId, long friendId) {
+        getUserById(userId).getFriendIds().remove(friendId);
+        getUserById(friendId).getFriendIds().remove(userId);
     }
 }
